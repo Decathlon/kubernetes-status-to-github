@@ -37,7 +37,7 @@ spec:
     spec:
       containers:
         - name: kubernetes-status
-          image: decathlon/status-to-deployment:1.2.3
+          image: decathlon/kubernetes-status-to-github:0.7.0
           # Args to add if you have to go through a proxy:
           # args:
           #  - -Dhttps.proxyHost=your-proxy.corp/cpù

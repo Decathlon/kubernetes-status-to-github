@@ -1,0 +1,88 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request: {}
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      checks: write
+      contents: read
+      pull-requests: write
+      statuses: write
+    steps:
+      - uses: actions/checkout@v3
+        id: checkout
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        id: setup-jdk
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          overwrite-settings: false
+
+      - name: Compile
+        id: compile
+        run: mvn clean verify
+
+      - name: Submit Dependencies
+        uses: advanced-security/maven-dependency-submission-action@v3
+        continue-on-error: true
+        with:
+          ignore-maven-wrapper: true
+
+      - name: sonar check
+        id: sonar-check
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          mvn sonar:sonar -Dsonar.projectKey=Decathlon_kubernetes-status-to-github \
+              -Dsonar.organization=decathlon \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          version: 'latest'
+          java-version: '17'
+          distribution: 'graalvm-community'
+          components: 'native-image'
+
+      - name: Create native package
+        shell: bash
+        run: |
+          mvn -Pnative native:compile
+
+
+      - name: define tag
+        id: define-tag
+        run: |
+          if [ ${{ github.event_name }} == 'pull_request' ] ; then
+            HEAD_SHA=${{ github.event.pull_request.head.sha }}
+            echo "TAG_NAME=PR-${{ github.event.pull_request.number }}-$(date +%Y%m%d%H%M)-${HEAD_SHA:0:8}" >> $GITHUB_ENV
+          else
+            echo "TAG_NAME=${GITHUB_REF#refs/heads/}-$(date +%Y%m%d%H%M)-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          fi
+
+      - name: Build docker image
+        id: build-docker-image
+        run: |
+          export docker_image_name=decathlon/kubernetes-status-to-github:$TAG_NAME
+          echo "docker_image_name=$docker_image_name" >> $GITHUB_ENV
+          docker buildx build -t $docker_image_name .
+
+      - name: push
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          docker push $docker_image_name

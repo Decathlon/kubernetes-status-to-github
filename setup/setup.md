@@ -8,7 +8,7 @@
 
 ## Setup
 
-The controller is available as a docker image here: decathlon/status-to-deployment:1.2.3.
+The controller is available as a docker image here: [decathlon/kubernetes-status-to-github:0.7.0](https://hub.docker.com/r/decathlon/kubernetes-status-to-github). (check the available tags from either release or dockerhub list).
 Using the latest version is recommended.
 But before launching the controller, it is important to understand how to configure it:
 
@@ -222,7 +222,7 @@ spec:
         envFrom:
         - secretRef:
             name: kube-to-status
-        image: decathlon/status-to-deployment:1.2.3
+        image: decathlon/kubernetes-status-to-github:0.7.0
         livenessProbe:
           failureThreshold: 3
           httpGet:
