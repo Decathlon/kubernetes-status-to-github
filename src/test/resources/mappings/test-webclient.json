@@ -1,0 +1,20 @@
+{
+  "name": "test webclient with authentication",
+  "request": {
+    "url": "/test",
+    "method": "GET",
+    "headers": {
+      "authorization": {
+        "equalTo": "Bearer my-fed-access-token",
+        "caseInsensitive": false
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": "abxd",
+    "headers": {
+      "content-type": "text/plain"
+    }
+  }
+}

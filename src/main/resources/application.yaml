@@ -1,0 +1,46 @@
+app:
+  mode: ${APP_MODE:capture_and_transfer} # can be `capture_and_process`, `process` or `capture_and_transfer` (default)
+
+  transfer:  # if the mode is `capture_and_transfer` this entry is mandatory. Define where to transfer the captured event and which oauth registration (client_credential) to use (defined later in this file)
+    host: ${TRANSFER_HOST:https://my.collector.corp:8080/processor}
+    oauth-registration: fedid
+
+  github: # Define how we interact with GitHub. We have to use a GitHub app or a PAT. You will need Read and Write access to `Deployments`.
+    app: # GitHub app definition. Mandatory if token not given
+      id: ${GITHUB_APP_ID:0}
+      private-key: ${GITHUB_APP_PRIVATE_KEY:}
+    orgs: ${GITHUB_ORG:myorg}
+    github-api: ${GITHUB_API:https://api.github.com}
+    token: ${GITHUB_TOKEN:} # A PAT. Mandatory if app not given
+
+  kubernetes: # only for `capture_and_process` and `capture_and_transfer` mode.
+    refresh: 60s # Will check new status every this much time
+
+spring:  # basic security configuration
+  security:
+    oauth2:
+      client:  # only for `capture_and_transfer` mode. It defines an OAuth2 client_credential configuration to connect to the transfer node.
+        provider:
+          fedid: # your oauth2 provider name
+            token-uri: ${OAUTH_TOKEN_URI:https://oauth.corporate.com/token.oauth2}  # You oauth2 token endpoint
+        registration:
+          fedid: # A registration name. This registration is used in the transfer block above.
+            provider: fedid # name of your oauth2 provider declared just before
+            authorization-grant-type: client_credentials
+            client-id: ${OAUTH_CLIENT_ID:0}
+            client-secret: ${OAUTH_CLIENT_SECRET:}
+
+      resourceserver: # only for `process` mode. This configuration is needed to validate request to the transfer endpoint.
+        jwt:
+          jwk-set-uri: ${OAUTH_JWKS_URI:https://oauth.corporate.com/JWKS}
+          issuer-uri: ${OAUTH_ISSUER_URI:https://corporate.com}
+
+---
+spring:
+  config:
+    activate:
+      on-cloud-platform: kubernetes
+  lifecycle:
+    timeout-per-shutdown-phase: 15s
+server:
+  shutdown: graceful

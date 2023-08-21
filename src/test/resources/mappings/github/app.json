@@ -1,0 +1,39 @@
+{
+  "mappings": [
+    {
+      "name": "app installation",
+      "request": {
+        "url": "/github/orgs/internal_org/installation",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "access_tokens_url": "http://localhost:9999/github/token"
+        },
+        "headers": {
+          "content-type": "application/json; charset=utf-8"
+        }
+      }
+    },
+    {
+      "name": "Get GitHub token",
+      "request": {
+        "url": "/github/token",
+        "method": "POST"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "expires_at": "2099-12-31T23:59:59Z",
+          "token": "132456-token-github"
+        },
+        "headers": {
+          "content-type": "application/json; charset=utf-8"
+        }
+      }
+    }
+  ]
+}
+
+

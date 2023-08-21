@@ -1,0 +1,224 @@
+{
+  "mappings": [
+    {
+      "name": "my-repo get deployment ref 1245",
+      "request": {
+        "urlPath": "/github/repos/internal_org/my-repo/deployments",
+        "method": "GET",
+        "queryParameters": {
+          "ref": {
+            "equalTo": "1245"
+          },
+          "environment": {
+            "equalTo": "my-env"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": [
+          {
+            "id": 5
+          }
+        ],
+        "headers": {
+          "content-type": "application/json; charset=utf-8"
+        }
+      }
+    },
+    {
+      "name": "my-repo create status on deployment ref 1245",
+      "request": {
+        "urlPath": "/github/repos/internal_org/my-repo/deployments/5/statuses",
+        "method": "POST",
+        "headers": {
+          "authorization": {
+            "equalTo": "token 132456-token-github"
+          }
+        },
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": {
+              "expression": "$.state",
+              "contains": "success"
+            }
+          }
+        ]
+      },
+      "response": {
+        "status": 201
+      }
+    },
+    {
+      "name": "my-repo retrieve deployment ref 1246",
+      "request": {
+        "urlPath": "/github/repos/internal_org/my-repo/deployments",
+        "method": "GET",
+        "queryParameters": {
+          "ref": {
+            "equalTo": "1246"
+          },
+          "environment": {
+            "equalTo": "my-env2"
+          }
+        },
+        "headers": {
+          "authorization": {
+            "equalTo": "token 132456-token-github"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": [],
+        "headers": {
+          "content-type": "application/json; charset=utf-8"
+        }
+      }
+    },
+    {
+      "name": "my-repo create deployment ref 1246",
+      "request": {
+        "urlPath": "/github/repos/internal_org/my-repo/deployments",
+        "method": "POST",
+        "headers": {
+          "authorization": {
+            "equalTo": "token 132456-token-github"
+          }
+        },
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": {
+              "expression": "$.ref",
+              "contains": "1246"
+            }
+          },
+          {
+            "matchesJsonPath": {
+              "expression": "$.environment",
+              "contains": "my-env2"
+            }
+          },
+          {
+            "matchesJsonPath": {
+              "expression": "$.payload.param",
+              "contains": "value"
+            }
+          },
+          {
+            "matchesJsonPath": {
+              "expression": "$.payload.url",
+              "contains": "http://here"
+            }
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "id": 6
+        },
+        "headers": {
+          "content-type": "application/json; charset=utf-8"
+        }
+      }
+    },
+    {
+      "name": "my-repo create status on deployment ref 1246",
+      "request": {
+        "urlPath": "/github/repos/internal_org/my-repo/deployments/6/statuses",
+        "method": "POST",
+        "headers": {
+          "authorization": {
+            "equalTo": "token 132456-token-github"
+          }
+        },
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": {
+              "expression": "$.state",
+              "contains": "in_progress"
+            }
+          }
+        ]
+      },
+      "response": {
+        "status": 201
+      }
+    },
+    {
+      "name": "my-repo retrieve deployment ref 422",
+      "request": {
+        "urlPath": "/github/repos/internal_org/my-repo/deployments",
+        "method": "GET",
+        "queryParameters": {
+          "ref": {
+            "equalTo": "422"
+          },
+          "environment": {
+            "equalTo": "my-env2"
+          }
+        },
+        "headers": {
+          "authorization": {
+            "equalTo": "token 132456-token-github"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": [],
+        "headers": {
+          "content-type": "application/json; charset=utf-8"
+        }
+      }
+    },
+    {
+      "name": "my-repo create deployment ref 422",
+      "request": {
+        "urlPath": "/github/repos/internal_org/my-repo/deployments",
+        "method": "POST",
+        "headers": {
+          "authorization": {
+            "equalTo": "token 132456-token-github"
+          }
+        },
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": {
+              "expression": "$.ref",
+              "contains": "422"
+            }
+          },
+          {
+            "matchesJsonPath": {
+              "expression": "$.environment",
+              "contains": "my-env2"
+            }
+          },
+          {
+            "matchesJsonPath": {
+              "expression": "$.payload.param",
+              "contains": "value"
+            }
+          },
+          {
+            "matchesJsonPath": {
+              "expression": "$.payload.url",
+              "contains": "http://here"
+            }
+          }
+        ]
+      },
+      "response": {
+        "status": 422,
+        "jsonBody": {
+          "message": "From GitHub: reference does not exist"
+        },
+        "headers": {
+          "content-type": "application/json; charset=utf-8"
+        }
+      }
+    }
+  ]
+}

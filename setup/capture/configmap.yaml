@@ -1,0 +1,32 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: kube-to-status
+  namespace: github
+data:
+  application.yaml: |
+    app:
+      mode: capture_and_transfer
+
+      transfer:
+        host: https://api.yourcorp.com/githubstatus/transfer
+        oauth-registration: oidc
+
+      kubernetes:
+        refresh: 30s
+
+    spring:
+      security:
+        oauth2:
+          client:
+            provider:
+              oidc:
+                token-uri: https://your-oidc.provider.com/token
+            registration:
+              oidc:
+                provider: oidc 
+                authorization-grant-type: client_credentials
+                client-id: ${CLIENT_ID:0}
+                client-secret: ${CLIENT_SECRET:}
+---

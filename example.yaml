@@ -1,0 +1,17 @@
+apiVersion: github.decathlon.com/v1beta1
+kind: GitHubDeployment
+metadata:
+  name: example
+spec:
+  sourceRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: podinfo-primary
+    namespace: test
+  extract:
+    containerName: podinfod  # get the tag of the image of this container. If not correct, just use jsonPath
+    # jsonPath: $.metadata.annotations.source-ref
+    regexp: (.*) # optional. If it there, capture a single group (can be named "ref")
+  repository:
+    name: 4keys
+    environment: staging

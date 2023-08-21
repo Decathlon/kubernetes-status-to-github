@@ -1,0 +1,51 @@
+app:
+  mode: process
+
+  transfer:
+    host: http://localhost:9999/processor
+    oauth-registration: test-idp
+
+  github:
+    app:
+      id: 54321
+      private-key: |
+        -----BEGIN RSA PRIVATE KEY-----
+        MIICXAIBAAKBgQDpNA/d2Iz17aWi1i1B2aymkuxfMawUz8/mRjmf001ZgyFXYpnz
+        YVV00tyDtwqM/6S6ufnqlF6+KDDM7+JrgiTSerOCHN0rzW2EyimMldGrmtYpbHFv
+        5by+wnsf8ywrVIhc4Q1SV1Tzf3ru7CwgSVrD4LWmvw0kLTmAskahYw2+0QIDAQAB
+        AoGAE2ko9O9EdGfuhIpNRBDpRQgvspDA4Q6XIHSx8TK2WoAGs25aoB527X1rq279
+        6tSQkpZOTg9Bf5R602QYNZikldPBsfogcecG2RNgXi/GT77Jq5UJMAih+ScUHnlg
+        fPs7J1FFbt2p7CTN768hXLkaswOlvxsgwl3qnW8mRc848Q0CQQD1rZiBlCvSinR+
+        QAu1rv8NYxVxVQYJtG60yxO7yoy3VXX8IATlH3w3of8EhM6o/PV8je5reIOGQXeW
+        1wy8h8EbAkEA8wBLImAKeFdNk2loFxEBEVk/36sHXPKAJ1hnkIyLDsL/FwMqSpxA
+        Gr6WODqvIodhT5x988HMH8QdfE/bua6qgwJBAL5zzdcd+37i0H4SvkEhIR3KoxPR
+        erXJR00mZOzej4mMWcOTOtg4OT6TebOSFPcR6midSqfLrAJG/CNWIMyCXOMCQDlr
+        clWXGCJDjuMsXxpEPFpbGorBoSXHb5zceOxhKWK9lQVdDBtBPKyVKG30//lKwCXN
+        tr1op9FByC3duO/xY/0CQE1LzZZjR8Al7i/XYu86bETiBQiQFpXI4vRmotat6qSg
+        vjUf7+KpXzPobw8CByEZ0LH0l6FSPv3TSgUpAgrU5oc=
+        -----END RSA PRIVATE KEY-----
+    orgs: internal_org
+    github-api: http://localhost:9999/github
+    token: ${GITHUB_TOKEN:}
+
+  kubernetes:
+    refresh: 10s
+
+spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          test-idp:
+            token-uri: http://localhost:9999/idp/token
+        registration:
+          test-idp:
+            provider: test-idp
+            authorization-grant-type: client_credentials
+            client-id: "my-client-id"
+            client-secret: "my-client-secret"
+
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:9999/idp/jwks
+          issuer-uri: idp-test.localhost

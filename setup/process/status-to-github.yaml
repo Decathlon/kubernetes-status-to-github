@@ -1,0 +1,102 @@
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: status-to-github
+  namespace: github
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: status-to-github
+  namespace: github
+data:
+  application.yaml: |
+    app:
+      mode: process
+
+      github:
+        app:
+          id: ${GITHUB_APP_ID:0}
+          private-key: ${GITHUB_APP_PRIVATE_KEY:}
+        orgs: dktunited
+        github-api: https://api.github.com
+
+    spring:
+      security:
+        oauth2:
+          resourceserver:
+            jwt:
+              jwk-set-uri: https://my-oidc.provider.com/JWKS
+              issuer-uri: my-oidc.provider.com
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: status-to-github
+  namespace: github
+type: Opaque
+data:
+  GITHUB_APP_ID: 1234
+  GITHUB_APP_PRIVATE_KEY: ---- PRIVATE KEY ---- ...
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: status-to-github
+  namespace: github
+  labels:
+    app: status-to-github
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: status-to-github
+  template:
+    metadata:
+      labels:
+        app: status-to-github
+    spec:
+      containers:
+        - name: kubernetes-status
+          image: decathlon/status-to-deployment:1.2.3
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: status-to-github
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+          volumeMounts:
+            - mountPath: /workspace/config
+              name: status-to-github
+          resources:
+            requests:
+              cpu: 500m
+              memory: 200Mi
+      serviceAccountName: status-to-github
+      volumes:
+        - name: status-to-github
+          configMap:
+            name: status-to-github
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: status-to-github
+  namespace: github
+  labels:
+    app: status-to-github
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: status-to-github
