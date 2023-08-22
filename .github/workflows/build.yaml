@@ -19,11 +19,7 @@ jobs:
 
     permissions:
       actions: write
-      checks: write
-      contents: read
-      pull-requests: write
-      security-events: write
-      statuses: write
+      contents: write
 
     steps:
       - uses: actions/checkout@v3
