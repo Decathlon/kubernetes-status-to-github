@@ -1,0 +1,56 @@
+name: release version
+
+on:
+  release:
+    types:
+      - published
+      - unpublished
+      - deleted
+
+
+jobs:
+  re-tag-image:
+    if: github.event.action == 'published'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+    steps:
+
+      - name: Find tag
+        id: default-tags
+        run: |
+          # Search the tag from 500 first tag, if more we will have to clean ...
+          FOUND=$(curl -L -s 'https://registry.hub.docker.com/v2/repositories/decathlon/kubernetes-status-to-github/tags?page_size=500' | jq -r '."results"[]["name"]' | grep "main-.*-${GITHUB_SHA:0:7}")
+          if [ -z $FOUND ] ; then 
+            exit 1;  
+          else
+            echo "MAIN_TAG_NAME=$FOUND" >> $GITHUB_ENV
+          fi ; 
+          echo "RELEASE_TAG_NAME=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+
+      - name: re-tag
+        id: re-tag
+        run: |
+          # it should be possible to do some api call to speed up the process, but has the image is small
+          docker pull decathlon/kubernetes-status-to-github:$MAIN_TAG_NAME
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          docker tag decathlon/kubernetes-status-to-github:$MAIN_TAG_NAME decathlon/kubernetes-status-to-github:$RELEASE_TAG_NAME
+
+
+
+  unpublish-image:
+    if: github.event.action == 'unpublished' || github.event.action == 'deleted'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+    steps:
+      - name: un-tag
+        id: un-tag
+        run: |
+          echo '{"username": "${{ secrets.DOCKERHUB_USERNAME }}", "password": "${{ secrets.DOCKERHUB_TOKEN }}"}' > /tmp/log.json
+
+          TOKEN=`curl -s -H "Content-Type: application/json" -X POST -d @/tmp/log.json "https://hub.docker.com/v2/users/login" | jq -r .token`
+
+          curl -X DELETE -H "Authorization: JWT ${TOKEN}" "https://hub.docker.com/v2/repositories/decathlon/kubernetes-status-to-github/tags/${{ github.event.release.tag_name }}" 
