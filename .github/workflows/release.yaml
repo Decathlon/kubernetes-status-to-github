@@ -36,6 +36,7 @@ jobs:
           docker pull decathlon/kubernetes-status-to-github:$MAIN_TAG_NAME
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
           docker tag decathlon/kubernetes-status-to-github:$MAIN_TAG_NAME decathlon/kubernetes-status-to-github:$RELEASE_TAG_NAME
+          docker push decathlon/kubernetes-status-to-github:$RELEASE_TAG_NAME
 
 
 
