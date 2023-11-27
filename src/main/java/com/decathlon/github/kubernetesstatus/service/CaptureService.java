@@ -60,7 +60,7 @@ public class CaptureService {
                     status = statusTemp;
                     break;
                 case CURRENT:
-                    if(status == null) {
+                    if(status.status().compareTo(KubeObjectStatus.CURRENT) == 0) {
                         status = statusTemp;
                     }
                 default:
