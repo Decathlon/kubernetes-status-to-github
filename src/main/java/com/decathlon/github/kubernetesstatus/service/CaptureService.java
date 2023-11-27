@@ -52,22 +52,12 @@ public class CaptureService {
 
         for(DynamicKubernetesObject dynamicKubernetesObject : dynamicKubernetesObjects) {
             log.info("[{}/{}] Will check {}/{} kubernetes object", deployment.getMetadata().getNamespace(), deployment.getMetadata().getName(), dynamicKubernetesObject.getMetadata().getNamespace(), dynamicKubernetesObject.getMetadata().getName());
-            boolean exit = false;
             KubeObjectResult statusTemp = Status.compute(dynamicKubernetesObject);
-            switch (statusTemp.status()) {
-                case FAILED:
-                    exit = true;
-                    status = statusTemp;
-                    break;
-                case CURRENT:
-                    if(status.status().compareTo(KubeObjectStatus.CURRENT) == 0) {
-                        status = statusTemp;
-                    }
-                default:
-                    status = statusTemp;
-                    break;
+
+            if(status == null || status.status().canMoveTo(statusTemp.status())) {
+                status = statusTemp;
             }
-            if(exit) break;
+            if(status.status().compareTo(KubeObjectStatus.CURRENT) != 0 ) break;
         }
 
 
