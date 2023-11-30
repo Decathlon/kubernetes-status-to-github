@@ -27,12 +27,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         id: setup-jdk
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
           overwrite-settings: false
 
       - name: Compile
@@ -59,7 +59,7 @@ jobs:
       - uses: graalvm/setup-graalvm@v1
         with:
           version: 'latest'
-          java-version: '17'
+          java-version: '21'
           distribution: 'graalvm-community'
           components: 'native-image'
 
