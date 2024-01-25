@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.0</version>
+        <version>3.2.2</version>
         <relativePath/>
     </parent>
     <groupId>com.decathlon.github</groupId>
@@ -50,7 +50,7 @@
         <dependency>
             <groupId>io.kubernetes</groupId>
             <artifactId>client-java-spring-integration</artifactId>
-            <version>18.0.1</version>
+            <version>19.0.0</version>
         </dependency>
 
         <dependency>
@@ -137,7 +137,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.11</version>
+                <version>0.8.12</version>
                 <executions>
                     <execution>
                         <id>default-prepare-agent</id>
@@ -195,5 +195,5 @@
             </dependencies>
         </profile>
     </profiles>
-    
+
 </project>
