@@ -12,11 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -97,8 +99,16 @@ public class GitHubEnvironmentService {
             var body = ret.getBody();
             if (body == null) {
                 return -1;
-            } else {
+            } else if (body.has("id")){
                 return body.get("id").asLong();
+            } else {
+                String msg;
+                if (body.has("message")){
+                    msg="Error when creating deployment: "+ body.get("message").asText();
+                } else {
+                    msg="Error when creating deployment.";
+                }
+                throw HttpClientErrorException.create(HttpStatusCode.valueOf(422), msg, ret.getHeaders(), msg.getBytes(Charset.defaultCharset()), Charset.defaultCharset());
             }
         } catch (HttpClientErrorException.NotFound ned) {
             // Not found => the ref is invalid or something like that.
@@ -115,7 +125,6 @@ public class GitHubEnvironmentService {
             }
             throw clientError;
         }
-
     }
 
     private void updateDeployment(String repo, long deployId, String environment, KubeObjectStatus status, String envUrl) {

@@ -33,3 +33,4 @@ build/
 
 ### private file ###
 **/*.private.*
+/application-*
