@@ -18,6 +18,8 @@ import org.springframework.security.oauth2.client.web.reactive.function.client.S
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
+import java.util.ArrayList;
+
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 // Native Conditional is not resolved at runtime without big config change.
@@ -51,8 +53,7 @@ public class TransferConfiguration {
 
         var clientProperties=new OAuth2ClientPropertiesMapper(oauthProperties);
 
-
-        var clientRepo= new InMemoryReactiveClientRegistrationRepository(clientProperties.asClientRegistrations().values().stream().toList());
+        var clientRepo= new InMemoryReactiveClientRegistrationRepository(new ArrayList<>(clientProperties.asClientRegistrations().values()));
 
         var oauthRepo=new InMemoryReactiveOAuth2AuthorizedClientService(clientRepo);
 
@@ -67,7 +68,6 @@ public class TransferConfiguration {
                 new ServerOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
 
         oauth2Client.setDefaultClientRegistrationId(appProperties.getTransfer().getOauthRegistration());
-
 
         return builder
                 .baseUrl(appProperties.getTransfer().getHost())

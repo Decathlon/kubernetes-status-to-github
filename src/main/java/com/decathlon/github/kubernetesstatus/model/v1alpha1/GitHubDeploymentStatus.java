@@ -1,7 +1,7 @@
 package com.decathlon.github.kubernetesstatus.model.v1alpha1;
 
 import com.decathlon.github.kubernetesstatus.service.kstatus.data.KubeObjectStatus;
-import io.fabric8.kubernetes.model.annotation.PrinterColumn;
+import io.fabric8.crd.generator.annotation.PrinterColumn;
 import io.swagger.annotations.ApiModel;
 import lombok.Builder;
 import lombok.Data;

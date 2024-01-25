@@ -1,7 +1,7 @@
 package com.decathlon.github.kubernetesstatus.mock;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
+import com.github.tomakehurst.wiremock.common.ConsoleNotifier;
 import com.github.tomakehurst.wiremock.matching.ContainsPattern;
 import com.github.tomakehurst.wiremock.matching.EqualToPattern;
 import org.junit.jupiter.api.AfterAll;
@@ -20,8 +20,7 @@ public class MockServer {
         wireMockServer = new WireMockServer(
                 wireMockConfig()
                         .port(9999)
-                        .extensions(new ResponseTemplateTransformer(false)
-                        )
+                        .notifier(new ConsoleNotifier(false))
         );
         initializeFedid(wireMockServer);
         wireMockServer.start();
