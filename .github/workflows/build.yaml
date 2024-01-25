@@ -61,7 +61,7 @@ jobs:
           version: 'latest'
           java-version: '21'
           distribution: 'graalvm-community'
-          components: 'native-image'
+          # components: 'native-image' # it is now default...
 
       - name: Create native package
         shell: bash
