@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
 
 
 @Data
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 @ApiModel(description = "GitHubDeployment spec part.")
 public class GitHubDeploymentSpec {
     private NamespacedObject sourceRef;
+    private List<NamespacedObject> additionnalRef;
     private ExtractRule extract;
     private RepositoryDetail repository;
 
