@@ -25,19 +25,15 @@ public class EventManager {
 
     public void addEvent(GitHubDeployment deployment, KubeObjectResult status, GitHubDeploymentSpec.NamespacedObject sourceRef, GitHubDeployment patch) {
         try {
-            Call fn = new CustomObjectsApi(apiClient).patchNamespacedCustomObjectStatusCall(
+            Call fn = new CustomObjectsApi(apiClient).patchNamespacedCustomObjectStatus(
                     GithubDeploymentRef.GROUP,
                     GithubDeploymentRef.CURRENT_VERSION,
                     deployment.getMetadata().getNamespace(),
                     GithubDeploymentRef.PLURAL,
                     deployment.getMetadata().getName(),
-                    patch,
-                    null,
-                    null,
-                    null,
-                    null
-            );
-
+                    patch
+            ).buildCall(null);
+            
             PatchUtils.<GitHubDeployment>patch(GitHubDeployment.class, () -> fn, V1Patch.PATCH_FORMAT_JSON_MERGE_PATCH, apiClient);
 
             eventRecorder.event(
