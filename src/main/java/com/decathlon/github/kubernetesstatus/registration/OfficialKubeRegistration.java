@@ -1,9 +1,9 @@
 package com.decathlon.github.kubernetesstatus.registration;
 
 import com.google.gson.annotations.JsonAdapter;
-import io.swagger.annotations.ApiModel;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
 import org.springframework.aot.hint.MemberCategory;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
@@ -25,19 +25,16 @@ public class OfficialKubeRegistration implements RuntimeHintsRegistrar {
 
     @Override
     public void registerHints(@NonNull RuntimeHints hints, @Nullable ClassLoader classLoader) {
-        var reflections = new Reflections("io.kubernetes");
-        var apiModels = reflections.getTypesAnnotatedWith(ApiModel.class);
-        var jsonAdapters = findJsonAdapters(reflections);
+        var reflections = new Reflections("io.kubernetes", Scanners.SubTypes.filterResultsBy(x->true), Scanners.TypesAnnotated);
 
         var all = new HashSet<Class<?>>();
-        all.addAll(jsonAdapters);
-        all.addAll(apiModels);
+        all.addAll(reflections.getSubTypesOf(Object.class));
+        all.addAll(findJsonAdapters(reflections));
         all.forEach(clzz -> hints.reflection().registerType(clzz, MemberCategory.values()));
 
         Stream.of(
+                okhttp3.internal.http.RetryAndFollowUpInterceptor.Companion.class,
                 io.kubernetes.client.informer.cache.ProcessorListener.class,
-                io.kubernetes.client.extended.controller.Controller.class,
-                io.kubernetes.client.extended.controller.ControllerManager.class,
                 io.kubernetes.client.util.generic.GenericKubernetesApi.StatusPatch.class,
                 io.kubernetes.client.util.Watch.Response.class
         ).forEach(clzz -> hints.reflection().registerType(clzz, MemberCategory.values()));
