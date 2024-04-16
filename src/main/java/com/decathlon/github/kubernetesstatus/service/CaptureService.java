@@ -1,9 +1,11 @@
 package com.decathlon.github.kubernetesstatus.service;
 
 import com.decathlon.github.kubernetesstatus.model.v1beta1.GitHubDeployment;
+import com.decathlon.github.kubernetesstatus.model.v1beta1.GitHubDeploymentSpec;
 import com.decathlon.github.kubernetesstatus.model.v1beta1.GitHubDeploymentStatus;
 import com.decathlon.github.kubernetesstatus.service.kstatus.Status;
 import com.decathlon.github.kubernetesstatus.service.kstatus.data.KubeObjectResult;
+import com.decathlon.github.kubernetesstatus.service.kstatus.data.KubeObjectStatus;
 import com.decathlon.github.kubernetesstatus.service.kubernetes.DynamicObjectExtractor;
 import com.decathlon.github.kubernetesstatus.service.kubernetes.EventManager;
 import com.google.gson.JsonArray;
@@ -18,9 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @Service
@@ -35,26 +35,41 @@ public class CaptureService {
 
 
     public void capture(GitHubDeployment deployment) {
+        List<DynamicKubernetesObject> dynamicKubernetesObjects = new ArrayList<>();
+        KubeObjectResult status = null;
+
+
         log.debug("[{}/{}] Observing GitHub Deployment", deployment.getMetadata().getNamespace(), deployment.getMetadata().getName());
 
-        var kobj=dynamicObjectExtractor.extractKubeObject(deployment.getSpec().getSourceRef());
-        if (kobj==null) {
+        dynamicKubernetesObjects.add(dynamicObjectExtractor.extractKubeObject(deployment.getSpec().getSourceRef()));
+        if (dynamicKubernetesObjects.isEmpty() || dynamicKubernetesObjects.get(0) ==null) {
             return;
         }
 
-        log.info("[{}/{}] Will check {}/{} kubernetes object", deployment.getMetadata().getNamespace(), deployment.getMetadata().getName(), kobj.getMetadata().getNamespace(), kobj.getMetadata().getName());
+        for(GitHubDeploymentSpec.NamespacedObject namespacedObject : deployment.getSpec().getAdditionnalRef()) {
+            dynamicKubernetesObjects.add(dynamicObjectExtractor.extractKubeObject(namespacedObject));
+        }
 
-        var ref=extractRef(deployment, kobj);
+        for(DynamicKubernetesObject dynamicKubernetesObject : dynamicKubernetesObjects) {
+            log.info("[{}/{}] Will check {}/{} kubernetes object", deployment.getMetadata().getNamespace(), deployment.getMetadata().getName(), dynamicKubernetesObject.getMetadata().getNamespace(), dynamicKubernetesObject.getMetadata().getName());
+            KubeObjectResult statusTemp = Status.compute(dynamicKubernetesObject);
+
+            if(status == null || status.status().canMoveTo(statusTemp.status())) {
+                status = statusTemp;
+            }
+            if(status.status().compareTo(KubeObjectStatus.CURRENT) != 0 ) break;
+        }
+
+
+        var ref=extractRef(deployment, dynamicKubernetesObjects.get(0));
         if (ref==null){
             log.warn("[{}/{}] Cannot extract ref from kube object with extract rule {}", deployment.getMetadata().getNamespace(), deployment.getMetadata().getName(), deployment.getSpec().getExtract());
             return;
         }
 
-        var status=Status.compute(kobj);
-
         log.info("[{}/{}] ref found is {}, computed status is {}", deployment.getMetadata().getNamespace(), deployment.getMetadata().getName(), ref, status);
 
-        updateGhd(deployment, kobj.getMetadata(), status, ref);
+        updateGhd(deployment, dynamicKubernetesObjects.get(0).getMetadata(), status, ref);
     }
 
     private void updateGhd(GitHubDeployment deployment, V1ObjectMeta metadata, KubeObjectResult status, String ref) {
