@@ -33,6 +33,7 @@ public class OfficialKubeRegistration implements RuntimeHintsRegistrar {
         all.forEach(clzz -> hints.reflection().registerType(clzz, MemberCategory.values()));
 
         Stream.of(
+                okhttp3.logging.HttpLoggingInterceptor.Companion.class,
                 okhttp3.internal.http.RetryAndFollowUpInterceptor.Companion.class,
                 io.kubernetes.client.informer.cache.ProcessorListener.class,
                 io.kubernetes.client.util.generic.GenericKubernetesApi.StatusPatch.class,
