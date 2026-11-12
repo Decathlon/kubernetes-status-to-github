@@ -6,7 +6,7 @@ import com.decathlon.github.kubernetesstatus.data.properties.AppMode;
 import com.decathlon.github.kubernetesstatus.data.properties.AppProperties;
 import com.decathlon.github.kubernetesstatus.service.github.GitHubEnvironmentService;
 import com.decathlon.github.kubernetesstatus.service.github.GitHubException;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

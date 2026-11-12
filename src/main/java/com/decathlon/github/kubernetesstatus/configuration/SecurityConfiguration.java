@@ -9,7 +9,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 
 @Configuration(proxyBeanMethods=false)
@@ -24,7 +24,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(matcher -> {
-                    matcher.requestMatchers(antMatcher("/actuator/**")).permitAll()
+                    matcher.requestMatchers(PathPatternRequestMatcher.withDefaults().matcher("/actuator/**")).permitAll()
                             .anyRequest().fullyAuthenticated();
                 })
 

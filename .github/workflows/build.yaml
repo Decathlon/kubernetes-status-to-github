@@ -40,7 +40,7 @@ jobs:
         run: mvn clean verify
 
       - name: Submit Dependencies
-        uses: advanced-security/maven-dependency-submission-action@v4
+        uses: advanced-security/maven-dependency-submission-action@v6
         continue-on-error: true
         with:
           ignore-maven-wrapper: true
@@ -49,7 +49,7 @@ jobs:
         id: sonar-check
         if: ${{ github.event_name == 'push' }}
         run: |
-          mvn sonar:sonar -Dsonar.projectKey=Decathlon_kubernetes-status-to-github \
+          mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Decathlon_kubernetes-status-to-github \
               -Dsonar.organization=decathlon \
               -Dsonar.host.url=https://sonarcloud.io \
               -Dsonar.token=${{ secrets.SONAR_TOKEN }}

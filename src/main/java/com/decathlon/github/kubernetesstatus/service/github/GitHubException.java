@@ -1,7 +1,7 @@
 package com.decathlon.github.kubernetesstatus.service.github;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import org.springframework.web.client.HttpClientErrorException;
 
 public class GitHubException extends RuntimeException {

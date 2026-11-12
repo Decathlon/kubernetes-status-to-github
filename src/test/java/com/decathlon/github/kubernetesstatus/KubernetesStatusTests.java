@@ -3,14 +3,15 @@ package com.decathlon.github.kubernetesstatus;
 import com.decathlon.github.kubernetesstatus.configuration.transfer.TransferConfiguration;
 import com.decathlon.github.kubernetesstatus.data.properties.AppProperties;
 import com.decathlon.github.kubernetesstatus.mock.MockServer;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
+import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.resttestclient.TestRestTemplate;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -20,6 +21,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import static com.decathlon.github.kubernetesstatus.mock.OauthTools.CLIENT_CREDENTIAL;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@AutoConfigureTestRestTemplate
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class KubernetesStatusTests {
     @Autowired
@@ -78,7 +80,7 @@ class KubernetesStatusTests {
         headers.add("Authorization", "Bearer " + CLIENT_CREDENTIAL);
         ret = rtTest.exchange(transferUrl, HttpMethod.POST, new HttpEntity<>("{}", headers), String.class);
 
-        assertThat(ret.getStatusCode().value()).isEqualTo(406);
+        assertThat(ret.getStatusCode().value()).isEqualTo(400);
     }
 
     @Test
