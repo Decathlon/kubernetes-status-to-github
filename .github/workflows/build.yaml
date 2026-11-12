@@ -58,7 +58,6 @@ jobs:
 
       - uses: graalvm/setup-graalvm@v1
         with:
-          version: '21.3.3'
           java-version: '21'
           distribution: 'graalvm-community'
           # components: 'native-image' # it is now default...
