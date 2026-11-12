@@ -14,7 +14,7 @@
     <name>kubernetes-status</name>
     <description>Status for deployment</description>
     <properties>
-        <java.version>21</java.version>
+        <java.version>25</java.version>
         <fabric8-lib.version>7.9.0</fabric8-lib.version>
     </properties>
     <dependencies>
@@ -127,6 +127,13 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <proc>full</proc>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.graalvm.buildtools</groupId>
                 <artifactId>native-maven-plugin</artifactId>
