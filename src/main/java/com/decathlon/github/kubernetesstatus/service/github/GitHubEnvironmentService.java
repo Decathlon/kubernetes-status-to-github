@@ -4,9 +4,9 @@ import com.decathlon.github.kubernetesstatus.data.properties.AppProperties;
 import com.decathlon.github.kubernetesstatus.model.v1beta1.GitHubDeploymentSpec;
 import com.decathlon.github.kubernetesstatus.service.kstatus.data.KubeObjectResult;
 import com.decathlon.github.kubernetesstatus.service.kstatus.data.KubeObjectStatus;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
@@ -55,7 +55,7 @@ public class GitHubEnvironmentService {
 
     private long getDeploymentId(String repo, String env, String ref) {
         var gh = appProperties.getGithub();
-        var uriBuilder=UriComponentsBuilder.fromHttpUrl(gh.getGithubApi())
+        var uriBuilder=UriComponentsBuilder.fromUriString(gh.getGithubApi())
                 .pathSegment("repos", gh.getOrgs(), repo, "deployments")
                 .queryParam("ref", ref)
                 .queryParam("environment", env);
@@ -76,7 +76,7 @@ public class GitHubEnvironmentService {
             throw new GitHubException(422, "An error 422 was returned by GitHub on this exact same request. We will not try again until a small duration.");
         }
         var gh = appProperties.getGithub();
-        var uriBuilder=UriComponentsBuilder.fromHttpUrl(gh.getGithubApi())
+        var uriBuilder=UriComponentsBuilder.fromUriString(gh.getGithubApi())
                 .pathSegment("repos", gh.getOrgs(), repo, "deployments");
 
         ObjectNode json = mapper.createObjectNode();
@@ -129,7 +129,7 @@ public class GitHubEnvironmentService {
 
     private void updateDeployment(String repo, long deployId, String environment, KubeObjectStatus status, String envUrl) {
         var gh = appProperties.getGithub();
-        var uriBuilder=UriComponentsBuilder.fromHttpUrl(gh.getGithubApi())
+        var uriBuilder=UriComponentsBuilder.fromUriString(gh.getGithubApi())
                 .pathSegment("repos", gh.getOrgs(), repo, "deployments", String.valueOf(deployId),"statuses");
 
         // GH State:

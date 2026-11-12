@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.decathlon.github.kubernetesstatus.data.properties.AppProperties;
 import com.decathlon.github.kubernetesstatus.exception.TechnicalException;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
@@ -153,7 +153,7 @@ public class GitHubTokenService {
         var ghHost=ghURI.getHost();
         ClientHttpRequestInterceptor interceptor=(request, body, execution)->{
             if ( ghHost.equals(request.getURI().getHost()) &&
-                    !request.getHeaders().containsKey("Authorization")) {
+                    !request.getHeaders().containsHeader("Authorization")) {
                 request.getHeaders().set("Authorization","token "+this.createToken());
             }
             return execution.execute(request, body);
